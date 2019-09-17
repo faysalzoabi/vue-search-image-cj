@@ -1,28 +1,64 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <h1>{{title}}</h1>
+    <form @submit.prevent="formSubmitted">
+        <label htmlFor="searchTerm">Search Term</label>
+        <input v-model="searchTerm" type="text" class="u-full-width" id="searchTerm"/>
+        <button type="submit">Search</button>
+    </form>
+      <div v-if="loading">
+        loading...
+      </div>
+      <section class="images">
+         <img v-for="image in images" :key="image.id" :src="image.webformatURL" alt="">
+      </section>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+ import axios from 'axios';
 
 export default {
   name: 'app',
+  data(){
+    return {
+      title:'VUE Image Search',
+      searchTerm:'',
+      images:[],
+      loading:false,
+    }
+  },
   components: {
-    HelloWorld
+    
+  },
+  methods: {
+    formSubmitted() {
+      console.log('hello');
+      this.loading=true;
+      this.images=[];
+      axios.get(`https://pixabay.com/api/?key=10719673-96a765bfec3365b312bfe2d33&q=${this.searchTerm}&image_type=photo&pretty=true`)
+         .then(result => {
+           console.log('result', result.data.hits);
+           this.images = result.data.hits;
+           this.loading=false;
+         })
+
+    }
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+body{
+  width:80%;
+  margin: 2em auto 0 auto;
+}
+
+img {
+  width:100%;
+}
+
+.images {
+  column-count: 3;
 }
 </style>
